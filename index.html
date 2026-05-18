@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            text-align: center;
+            background-color: lightblue;
+            padding-top: 50px;
+            overflow: hidden;
+        }
+
+        .container{
+            background-color: white;
+            width: 400px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1{
+            color: darkblue;
+        }
+
+        button{
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #nextBtn{
+            background-color: blue;
+            color: white;
+            border: none;
+        }
+
+        .result{
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Confetti Papers */
+
+        .confetti{
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall{
+
+            0%{
+                transform: translateY(0) rotate(0deg);
+            }
+
+            100%{
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <!-- Start Screen -->
+
+    <div class="container" id="startScreen">
+
+        <h1>Quiz Game</h1>
+
+        <button onclick="startQuiz()">Start Quiz</button>
+
+    </div>
+
+    <!-- Quiz Screen -->
+
+    <div class="container" id="quizScreen" style="display:none;">
+
+        <h2 id="question"></h2>
+
+        <div id="answers"></div>
+
+        <div class="result" id="result"></div>
+
+        <button id="nextBtn" onclick="skipQuestion()">
+            Next Question 
+        </button>
+
+    </div>
+
+    <script>
+
+        const quizData = [
+
+            {
+                question: "What does HTML stand for?",
+
+                options: [
+                    "Hyper Text Markup Language",
+                    "High Text Machine Language",
+                    "Hyperlinks Text Mark Language",
+                    "Home Tool Markup Language"
+                ],
+
+                correct: "Hyper Text Markup Language"
+            },
+
+            {
+                question: "Which language is used for styling webpages?",
+
+                options: [
+                    "HTML",
+                    "CSS",
+                    "Python",
+                    "Java"
+                ],
+
+                correct: "CSS"
+            },
+
+            {
+                question: "Which language makes webpages interactive?",
+
+                options: [
+                    "JavaScript",
+                    "C++",
+                    "Java",
+                    "SQL"
+                ],
+
+                correct: "JavaScript"
+            }
+
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let wrongAnswers = 0;
+        let notAttempted = 0;
+
+        function startQuiz(){
+
+            document.getElementById("startScreen").style.display = "none";
+
+            document.getElementById("quizScreen").style.display = "block";
+
+            loadQuestion();
+        }
+
+        function loadQuestion(){
+
+            document.getElementById("result").innerText = "";
+
+            const questionData = quizData[currentQuestion];
+
+            document.getElementById("question").innerText =
+                questionData.question;
+
+            const answersDiv = document.getElementById("answers");
+
+            answersDiv.innerHTML = "";
+
+            questionData.options.forEach(option => {
+
+                const button = document.createElement("button");
+
+                button.innerText = option;
+
+                button.onclick = function(){
+
+                    if(option === questionData.correct){
+
+                        score++;
+
+                        document.getElementById("result").innerText =
+                            "✅ Correct Answer";
+
+                    } else {
+
+                        wrongAnswers++;
+
+                        document.getElementById("result").innerText =
+                            "❌ Wrong Answer";
+                    }
+
+                    setTimeout(nextQuestion, 1000);
+                };
+
+                answersDiv.appendChild(button);
+
+            });
+
+        }
+
+        function skipQuestion(){
+
+            notAttempted++;
+
+            document.getElementById("result").innerText =
+                "⚠️ Not Attempted";
+
+            setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion(){
+
+            currentQuestion++;
+
+            if(currentQuestion < quizData.length){
+
+                loadQuestion();
+
+            } else {
+
+                let finalMessage = "";
+
+                if(score === 0){
+
+                    finalMessage =
+                        "<h2 style='color:red;'>😢 You Lose The Quiz</h2>";
+
+                } else {
+
+                    finalMessage =
+                        "<h2>🎉 Congratulations Hurry! 🎉</h2>";
+               
+
+                    createConfetti();
+                }
+
+                document.getElementById("quizScreen").innerHTML =
+
+                    "<h2>Quiz Completed!</h2>" +
+
+                    "<h3>Total Score: " + score + " / " + quizData.length + "</h3>" +
+
+                    "<h3>Wrong Answers: " + wrongAnswers + "</h3>" +
+
+                    "<h3>Not Attempted: " + notAttempted + "</h3>" +
+
+                    finalMessage;
+            }
+
+        }
+
+        /* Confetti Effect */
+
+        function createConfetti(){
+
+            for(let i = 0; i < 100; i++){
+
+                let confetti = document.createElement("div");
+
+                confetti.classList.add("confetti");
+
+                confetti.style.left = Math.random() * 100 + "vw";
+
+                confetti.style.backgroundColor =
+                    "hsl(" + Math.random() * 360 + ",100%,50%)";
+
+                confetti.style.animationDuration =
+                    (Math.random() * 3 + 2) + "s";
+
+                document.body.appendChild(confetti);
+            }
+        }
+
+    </script>
+
+</body>
+</html>
